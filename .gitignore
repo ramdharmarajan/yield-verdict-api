@@ -1,0 +1,23 @@
+## .NET / ASP.NET Core
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+*.swp
+
+## Secrets & environment
+appsettings.Development.json
+appsettings.*.json
+!appsettings.json
+*.env
+.env
+
+## Publish output
+publish/
+out/
+
+## OS
+.DS_Store
+Thumbs.db
