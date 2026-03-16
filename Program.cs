@@ -35,14 +35,25 @@ if (!string.IsNullOrEmpty(stripeWebhookSecret)) builder.Configuration["Stripe:We
 if (!string.IsNullOrEmpty(stripeSecret))
     StripeConfiguration.ApiKey = stripeSecret;
 
-// CORS
+// CORS — support explicit origins + wildcard subdomains for Lovable/dev environments
+var lovableWildcards = new[] { "https://*.lovable.app", "https://*.lovableproject.com" };
+var allAllowedOrigins = allowedOrigins.Concat(lovableWildcards).ToArray();
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins(allowedOrigins)
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        if (allowedOrigins.Contains("*"))
+        {
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        }
+        else
+        {
+            policy.WithOrigins(allAllowedOrigins)
+                  .SetIsOriginAllowedToAllowWildcardSubdomains()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
     });
 });
 
