@@ -26,8 +26,9 @@ if (!string.IsNullOrEmpty(supabaseJwtSecret)) builder.Configuration["Supabase:Jw
 if (!string.IsNullOrEmpty(stripeSecret)) builder.Configuration["Stripe:SecretKey"] = stripeSecret;
 if (!string.IsNullOrEmpty(stripeWebhookSecret)) builder.Configuration["Stripe:WebhookSecret"] = stripeWebhookSecret;
 
-// Stripe
-StripeConfiguration.ApiKey = stripeSecret;
+// Stripe — only configure if key is present
+if (!string.IsNullOrEmpty(stripeSecret))
+    StripeConfiguration.ApiKey = stripeSecret;
 
 // CORS
 builder.Services.AddCors(options =>
