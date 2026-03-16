@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "dotnet YieldverdictApi.dll",
+    "startCommand": "dotnet /app/publish/YieldverdictApi.dll",
     "restartPolicyType": "ON_FAILURE",
     "healthcheckPath": "/health"
   }

@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["dotnet-sdk_10"]
+
+[phases.build]
+cmds = ["dotnet publish YieldverdictApi.csproj -c Release -o /app/publish"]
+
+[start]
+cmd = "dotnet /app/publish/YieldverdictApi.dll"
