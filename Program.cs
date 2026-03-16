@@ -15,7 +15,12 @@ var supabaseKey = Environment.GetEnvironmentVariable("SUPABASE_SERVICE_KEY") ?? 
 var stripeSecret = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY") ?? config["Stripe:SecretKey"] ?? string.Empty;
 var stripeWebhookSecret = Environment.GetEnvironmentVariable("STRIPE_WEBHOOK_SECRET") ?? config["Stripe:WebhookSecret"] ?? string.Empty;
 var supabaseJwtSecret = Environment.GetEnvironmentVariable("SUPABASE_JWT_SECRET") ?? config["Supabase:JwtSecret"] ?? string.Empty;
-var allowedOrigin = Environment.GetEnvironmentVariable("ALLOWED_ORIGIN") ?? config["AllowedOrigin"] ?? "http://localhost:3000";
+// Support comma-separated origins e.g. "https://yieldverdict.lovable.app,https://yieldverdict.co.uk"
+var allowedOriginsRaw = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS")
+    ?? Environment.GetEnvironmentVariable("ALLOWED_ORIGIN")
+    ?? config["AllowedOrigin"]
+    ?? "http://localhost:3000";
+var allowedOrigins = allowedOriginsRaw.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
 
 // Override config with env vars
@@ -35,7 +40,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins(allowedOrigin)
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
