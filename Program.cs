@@ -14,6 +14,7 @@ var supabaseUrl = Environment.GetEnvironmentVariable("SUPABASE_URL") ?? config["
 var supabaseKey = Environment.GetEnvironmentVariable("SUPABASE_SERVICE_KEY") ?? config["Supabase:ServiceKey"] ?? string.Empty;
 var stripeSecret = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY") ?? config["Stripe:SecretKey"] ?? string.Empty;
 var stripeWebhookSecret = Environment.GetEnvironmentVariable("STRIPE_WEBHOOK_SECRET") ?? config["Stripe:WebhookSecret"] ?? string.Empty;
+var supabaseJwtSecret = Environment.GetEnvironmentVariable("SUPABASE_JWT_SECRET") ?? config["Supabase:JwtSecret"] ?? string.Empty;
 var allowedOrigin = Environment.GetEnvironmentVariable("ALLOWED_ORIGIN") ?? config["AllowedOrigin"] ?? "http://localhost:3000";
 var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
 
@@ -21,6 +22,7 @@ var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
 if (!string.IsNullOrEmpty(anthropicKey)) builder.Configuration["Anthropic:ApiKey"] = anthropicKey;
 if (!string.IsNullOrEmpty(supabaseUrl)) builder.Configuration["Supabase:Url"] = supabaseUrl;
 if (!string.IsNullOrEmpty(supabaseKey)) builder.Configuration["Supabase:ServiceKey"] = supabaseKey;
+if (!string.IsNullOrEmpty(supabaseJwtSecret)) builder.Configuration["Supabase:JwtSecret"] = supabaseJwtSecret;
 if (!string.IsNullOrEmpty(stripeSecret)) builder.Configuration["Stripe:SecretKey"] = stripeSecret;
 if (!string.IsNullOrEmpty(stripeWebhookSecret)) builder.Configuration["Stripe:WebhookSecret"] = stripeWebhookSecret;
 
@@ -54,18 +56,19 @@ builder.Services.AddScoped<IFloodRiskService, FloodRiskService>();
 builder.Services.AddScoped<IInsightsService, InsightsService>();
 builder.Services.AddScoped<CalculationService>();
 
-// JWT Authentication
+// JWT Authentication — use Supabase JWT secret (NOT the service key)
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuerSigningKey = !string.IsNullOrEmpty(supabaseKey),
-            IssuerSigningKey = string.IsNullOrEmpty(supabaseKey)
+            ValidateIssuerSigningKey = !string.IsNullOrEmpty(supabaseJwtSecret),
+            IssuerSigningKey = string.IsNullOrEmpty(supabaseJwtSecret)
                 ? null
-                : new SymmetricSecurityKey(Encoding.UTF8.GetBytes(supabaseKey)),
+                : new SymmetricSecurityKey(Encoding.UTF8.GetBytes(supabaseJwtSecret)),
             ValidateIssuer = false,
             ValidateAudience = false,
+            ClockSkew = TimeSpan.Zero
         };
     });
 
