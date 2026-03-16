@@ -33,6 +33,43 @@ public class AnalyseController : ControllerBase
         _logger = logger;
     }
 
+    // GET /api/analyse/{postcode}?purchasePrice=250000&ltv=75&interestRate=4.75&...
+    [HttpGet("{postcode}")]
+    public async Task<IActionResult> AnalyseGet(
+        string postcode,
+        [FromQuery] decimal? purchasePrice,
+        [FromQuery] int ltv = 75,
+        [FromQuery] decimal interestRate = 5.0m,
+        [FromQuery] bool isAdditionalProperty = true,
+        [FromQuery] string taxBand = "higher",
+        [FromQuery] int managementPct = 10,
+        [FromQuery] int voidWeeks = 3,
+        [FromQuery] decimal refurbBudget = 0,
+        [FromQuery] decimal growthAssumption = 3.0m,
+        [FromQuery] string mortgageType = "repayment",
+        [FromQuery] int holdYears = 5)
+    {
+        var request = new AnalyseRequest
+        {
+            Postcode = postcode,
+            Scenario = new ScenarioInput
+            {
+                PriceOverride = purchasePrice,
+                Ltv = ltv,
+                InterestRate = interestRate,
+                IsAdditionalProperty = isAdditionalProperty,
+                TaxBand = taxBand,
+                ManagementPct = managementPct,
+                VoidWeeks = voidWeeks,
+                RefurbBudget = refurbBudget,
+                GrowthAssumption = growthAssumption,
+                MortgageType = mortgageType,
+                HoldYears = holdYears
+            }
+        };
+        return await Analyse(request);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Analyse([FromBody] AnalyseRequest request)
     {
